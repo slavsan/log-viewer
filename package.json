@@ -1,0 +1,32 @@
+{
+  "name": "log-viewer",
+  "version": "1.0.0",
+  "description": "An app for viewing logs",
+  "main": "main.js",
+  "scripts": {
+    "lint": "eslint --ext .js --ext .jsx src test && echo '✓ All good'",
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slavsan/log-viewer.git"
+  },
+  "author": "Slavcho Slavchev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slavsan/log-viewer/issues"
+  },
+  "homepage": "https://github.com/slavsan/log-viewer#readme",
+  "dependencies": {
+    "electron": "^1.6.11"
+  },
+  "devDependencies": {
+    "eslint": "^4.2.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
