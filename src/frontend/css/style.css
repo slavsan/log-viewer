@@ -1,0 +1,57 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+#app {
+    height: 100%;
+}
+
+#app > .container-fluid,
+#app > .container-fluid > .row,
+#app > .container-fluid > .row > div {
+    height: 100%;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.content .toolbar {
+    border-bottom: 1px solid #ccc;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.content .toolbar h1 {
+    flex: 1;
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+.content .toolbar .actions {
+}
+
+.content .log {
+    flex: 1;
+    overflow-y: scroll;
+    margin-right: -15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.content .log .line.raw:before {
+    content: '→ ';
+    color: #ccc;
+}
+
+.content .log .line.nowrap {
+    white-space: nowrap;
+}
