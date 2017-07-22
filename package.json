@@ -25,7 +25,8 @@
     "react": "^15.6.1",
     "react-bootstrap": "^0.31.1",
     "react-dom": "^15.6.1",
-    "tail": "^1.2.2"
+    "tail": "^1.2.2",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

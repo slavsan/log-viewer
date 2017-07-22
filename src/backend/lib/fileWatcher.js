@@ -12,4 +12,6 @@ fileWatcher.watchFile = (filename, onNewLine, onError) => {
   tail.on('error', (error) => {
     onError(error)
   })
+
+  return tail
 }
