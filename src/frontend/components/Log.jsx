@@ -2,10 +2,10 @@ import React from 'react'
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap'
 import classNames from 'classnames'
 
-const Log = ({ file }) => {
-  const classes = classNames('line', {
+const Log = ({ file, toggleWrap }) => {
+  const classes = classNames('log', {
     raw: true,
-    nowrap: true
+    nowrap: file.nowrap
   })
 
   return (
@@ -14,13 +14,13 @@ const Log = ({ file }) => {
         <h1>{file.filename}</h1>
         <div className="actions">
           <ButtonGroup bsSize="sm">
-            <Button>Wrap</Button>
-            <Button>Follow log</Button>
+            <Button active={!file.nowrap} onClick={() => toggleWrap(file.uuid)}>Wrap</Button>
+            <Button disabled>Follow log</Button>
           </ButtonGroup>
           {' '}
           <ButtonGroup bsSize="sm">
             <Button active>Raw</Button>
-            <Button>Parsed</Button>
+            <Button disabled>Parsed</Button>
           </ButtonGroup>
           {' '}
           <Button bsSize="sm" className="btn-settings">
@@ -28,10 +28,13 @@ const Log = ({ file }) => {
           </Button>
         </div>
       </div>
-      <div className="log">
+      <div className={classes}>
         <div>
           {file.lines.map((line, index) =>
-            <div key={index} className={classes}>{line}</div>
+            <div key={index} className="line">
+              <span className="line-vertical-fix" />
+              <span className="line-text">{line}</span>
+            </div>
           )}
         </div>
       </div>

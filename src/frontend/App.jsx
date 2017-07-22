@@ -13,6 +13,7 @@ class App extends React.Component {
     }
 
     this.setListeners = this.setListeners.bind(this)
+    this.toggleWrap = this.toggleWrap.bind(this)
   }
 
   componentDidMount () {
@@ -36,6 +37,7 @@ class App extends React.Component {
     console.log('add file:', file)
     const files = JSON.parse(JSON.stringify(this.state.files))
     const currentFile = this.state.currentFile || file.uuid
+    file.nowrap = true
     files.push(file)
     this.setState({ files, currentFile }, cb)
   }
@@ -64,13 +66,25 @@ class App extends React.Component {
     return file
   }
 
+  toggleWrap (id) {
+    const files = this.state.files
+    const file = files.filter(f => f.uuid === id)[0]
+    if (file) {
+      file.nowrap = !file.nowrap
+      this.setState({ files })
+    }
+  }
+
   renderContent () {
     const file = this.currentFile()
 
     if (file.uuid) {
       return (
         <div className="content">
-          <Log file={file} />
+          <Log
+            file={file}
+            toggleWrap={this.toggleWrap}
+          />
         </div>
       )
     }

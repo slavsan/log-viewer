@@ -95,21 +95,28 @@ html, body {
     flex-wrap: nowrap;
 }
 
-.content .log .line.raw:before {
+.content .log .line:before {
     content: '→ ';
     color: #ccc;
 }
 
-.content .log .line.nowrap {
-    white-space: nowrap;
-    flex: 0 0 auto;
-    padding: 0 5px;
+.content .log .line {
+    display: flex;
+    padding: 0 10px;
     width: 100%;
+}
+
+.content .log.nowrap .line {
+    white-space: nowrap;
 }
 
 .content.empty {
     flex-direction: row;
     align-items: center;
+}
+
+.line-vertical-fix {
+    padding-left: 10px;
 }
 
 .drag-n-drop {
