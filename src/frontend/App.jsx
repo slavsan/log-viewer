@@ -4,16 +4,23 @@ import Log from './components/Log'
 
 const { ipcRenderer } = require('electron')
 
+const utils = require('./lib/utils')
+const parsers = require('./data')
+
+const sortedParsers = parsers.sort(utils.compare)
+
 class App extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       files: [],
-      currentFile: ''
+      currentFile: '',
+      parsers: []
     }
 
     this.setListeners = this.setListeners.bind(this)
     this.toggleWrap = this.toggleWrap.bind(this)
+    this.setFormat = this.setFormat.bind(this)
   }
 
   componentDidMount () {
@@ -34,23 +41,31 @@ class App extends React.Component {
   }
 
   addFile (file, cb) {
-    console.log('add file:', file)
+    // console.log('add file:', file)
     const files = JSON.parse(JSON.stringify(this.state.files))
     const currentFile = this.state.currentFile || file.uuid
     file.nowrap = true
+    file.raw = false // @todo default to true?
     files.push(file)
     this.setState({ files, currentFile }, cb)
   }
 
   addLineToFile (line, file) {
-    console.log('file (%s) has received new line: %s', file.filename, line)
+    // console.log('file (%s) has received new line: %s', file.filename, line)
     const files = JSON.parse(JSON.stringify(this.state.files))
     const modifiedFile = files.filter(f => f.uuid === file.uuid)[0]
     if (modifiedFile) {
       if (!modifiedFile.lines) {
         modifiedFile.lines = []
       }
+      if (!modifiedFile.parsed) {
+        modifiedFile.parsed = {
+          lines: []
+        }
+      }
       modifiedFile.lines.push(line)
+      utils.parseLine(sortedParsers, line, modifiedFile)
+
       this.setState({ files })
     }
   }
@@ -58,10 +73,15 @@ class App extends React.Component {
   currentFile () {
     const file = this.state.files.filter(f => f.uuid === this.state.currentFile)[0]
     if (!file) {
-      return { filename: '', lines: [] }
+      return { filename: '', lines: [], parsed: { lines: [] } }
     }
     if (!file.lines) {
       file.lines = []
+    }
+    if (!file.parsed) {
+      file.parsed = {
+        lines: []
+      }
     }
     return file
   }
@@ -75,6 +95,15 @@ class App extends React.Component {
     }
   }
 
+  setFormat (id, format) {
+    const files = this.state.files
+    const file = files.filter(f => f.uuid === id)[0]
+    if (file) {
+      file.raw = (format === 'raw')
+      this.setState({ files })
+    }
+  }
+
   renderContent () {
     const file = this.currentFile()
 
@@ -84,6 +113,7 @@ class App extends React.Component {
           <Log
             file={file}
             toggleWrap={this.toggleWrap}
+            onSetFormat={this.setFormat}
           />
         </div>
       )

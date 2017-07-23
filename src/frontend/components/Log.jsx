@@ -2,11 +2,36 @@ import React from 'react'
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap'
 import classNames from 'classnames'
 
-const Log = ({ file, toggleWrap }) => {
+const getTitle = (line) => {
+  if (!line.lines) return line.text
+  return line.lines.join('|')
+}
+
+const Log = ({ file, toggleWrap, onSetFormat }) => {
   const classes = classNames('log', {
-    raw: true,
+    raw: file.raw,
     nowrap: file.nowrap
   })
+
+  const lines = file.raw ? (
+    <div style={{ width: '100%' }}>
+      {file.lines.map((line, index) =>
+        <div key={index} className="line">
+          <span className="line-vertical-fix" />
+          <span className="line-text">{line}</span>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div style={{ width: '100%' }}>
+      {file.parsed.lines.map((line, index) =>
+        <div key={index} className="line" title={getTitle(line)}>
+          <span className="line-vertical-fix" style={{ background: line.color }} />
+          <span className="line-text">{line.text}</span>
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div className="box">
@@ -19,8 +44,8 @@ const Log = ({ file, toggleWrap }) => {
           </ButtonGroup>
           {' '}
           <ButtonGroup bsSize="sm">
-            <Button active>Raw</Button>
-            <Button disabled>Parsed</Button>
+            <Button active={file.raw} onClick={() => onSetFormat(file.uuid, 'raw')}>Raw</Button>
+            <Button active={!file.raw} onClick={() => onSetFormat(file.uuid, 'parsed')}>Parsed</Button>
           </ButtonGroup>
           {' '}
           <Button bsSize="sm" className="btn-settings">
@@ -29,14 +54,7 @@ const Log = ({ file, toggleWrap }) => {
         </div>
       </div>
       <div className={classes}>
-        <div>
-          {file.lines.map((line, index) =>
-            <div key={index} className="line">
-              <span className="line-vertical-fix" />
-              <span className="line-text">{line}</span>
-            </div>
-          )}
-        </div>
+        {lines}
       </div>
     </div>
   )
