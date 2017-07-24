@@ -1,3 +1,5 @@
+const uuidv4 = require('uuid/V4')
+
 const utils = module.exports = {}
 
 utils.compare = (a, b) => {
@@ -8,6 +10,7 @@ utils.compare = (a, b) => {
 
 utils.parseLine = (parsers, line, file) => {
   const parsedLine = {
+    uuid: uuidv4(),
     color: '#ababab',
     text: line,
     raw: line
@@ -23,7 +26,7 @@ utils.parseLine = (parsers, line, file) => {
         parsedLine.type = p.type
         parsedLine.color = p.color
         parsedLine.open = true
-        parsedLine.expanded = false
+        parsedLine.expanded = true
         parsedLine.lines = []
         parsedLine.lines.push(line)
         return false

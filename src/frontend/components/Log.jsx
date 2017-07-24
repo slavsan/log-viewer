@@ -7,7 +7,7 @@ const getTitle = (line) => {
   return line.lines.join('|')
 }
 
-const Log = ({ file, toggleWrap, onSetFormat }) => {
+const Log = ({ file, toggleWrap, onSetFormat, toggleExpand }) => {
   const classes = classNames('log', {
     raw: file.raw,
     nowrap: file.nowrap
@@ -17,17 +17,31 @@ const Log = ({ file, toggleWrap, onSetFormat }) => {
     <div style={{ width: '100%' }}>
       {file.lines.map((line, index) =>
         <div key={index} className="line">
-          <span className="line-vertical-fix" />
-          <span className="line-text">{line}</span>
+          <div className="line-vertical-fix" />
+          <div className="line-text">{line}</div>
         </div>
       )}
     </div>
   ) : (
     <div style={{ width: '100%' }}>
-      {file.parsed.lines.map((line, index) =>
-        <div key={index} className="line" title={getTitle(line)}>
-          <span className="line-vertical-fix" style={{ background: line.color }} />
-          <span className="line-text">{line.text}</span>
+      {file.parsed.lines.map(line =>
+        <div
+          key={line.uuid}
+          className="line"
+          title={getTitle(line)}
+          onClick={() => toggleExpand(file.uuid, line.uuid)}
+        >
+          <div className="line-vertical-fix" style={{ background: line.color }} />
+          <div className="line-text">
+            {line.text}
+            {line.expanded && line.lines && (
+              <div>
+                {line.lines.map((l, index) =>
+                  <div key={index}>{l}</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

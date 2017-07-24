@@ -20,6 +20,7 @@ class App extends React.Component {
 
     this.setListeners = this.setListeners.bind(this)
     this.toggleWrap = this.toggleWrap.bind(this)
+    this.toggleExpand = this.toggleExpand.bind(this)
     this.setFormat = this.setFormat.bind(this)
   }
 
@@ -95,6 +96,18 @@ class App extends React.Component {
     }
   }
 
+  toggleExpand (fileId, lineId) {
+    const files = this.state.files
+    const file = files.filter(f => f.uuid === fileId)[0]
+    if (file) {
+      const line = file.parsed.lines.filter(l => l.uuid === lineId)[0]
+      if (line) {
+        line.expanded = !line.expanded
+        this.setState({ files })
+      }
+    }
+  }
+
   setFormat (id, format) {
     const files = this.state.files
     const file = files.filter(f => f.uuid === id)[0]
@@ -114,6 +127,7 @@ class App extends React.Component {
             file={file}
             toggleWrap={this.toggleWrap}
             onSetFormat={this.setFormat}
+            toggleExpand={this.toggleExpand}
           />
         </div>
       )
