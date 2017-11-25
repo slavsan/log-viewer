@@ -2,7 +2,9 @@ const Tail = require('tail').Tail
 
 const fileWatcher = module.exports = {}
 
-fileWatcher.watchFile = (filename, onNewLine, onError) => {
+const files = {}
+
+fileWatcher.watchFile = (id, filename, onNewLine, onError) => {
   const tail = new Tail(filename);
 
   tail.on('line', (data) => {
@@ -13,5 +15,12 @@ fileWatcher.watchFile = (filename, onNewLine, onError) => {
     onError(error)
   })
 
+  files[id] = tail
+
   return tail
+}
+
+fileWatcher.unwatchFile = (id) => {
+  files[id].unwatch()
+  delete files[id]
 }

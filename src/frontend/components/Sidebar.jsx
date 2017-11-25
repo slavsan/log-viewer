@@ -17,6 +17,20 @@ const classes = (file, currentFile) => {
   })
 }
 
+const showContextMenu = (e, id) => {
+  e.preventDefault()
+  const { Menu, MenuItem } = remote
+  const menu = new Menu()
+  menu.append(new MenuItem({
+    label: 'Remove from list',
+    click() {
+      ipcRenderer.send('closeFile', id)
+    }
+  }))
+
+  menu.popup(remote.getCurrentWindow())
+}
+
 const Sidebar = ({ files, onSelectFile, currentFile }) => {
   return (
     <div className="sidebar">
@@ -32,6 +46,7 @@ const Sidebar = ({ files, onSelectFile, currentFile }) => {
               title={file.filename}
               className={classes(file, currentFile)}
               onClick={() => onSelectFile(file.uuid)}
+              onContextMenu={(e) => showContextMenu(e, file.uuid)}
             >
               {file.shortName}
             </li>

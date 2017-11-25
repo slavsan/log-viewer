@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const { ipcMain } = require('electron')
 const uuidv4 = require('uuid/V4')
@@ -23,7 +24,8 @@ backend.openFile = (filename) => {
     mainWindow.webContents.send('openedFile', {
       uuid: file.uuid,
       filename: file.filename,
-      shortName: file.shortName
+      shortName: file.shortName,
+      contents: fs.readFileSync(filename, 'utf8')
     })
   })
 }
@@ -34,7 +36,6 @@ backend.isFileAlreadyOpened = (filename) => {
 
 backend.setFrontendListeners = () => {
   ipcMain.on('openFiles', (event, filenames) => {
-    // console.log('received filenames', filenames)
     if (!filenames || !filenames.length) return console.error('filenames are not specified')
     filenames.forEach(filename => backend.openFile(filename))
   })
@@ -43,14 +44,25 @@ backend.setFrontendListeners = () => {
   // This makes sure that each time you hit `Cmd+R` and reload the frontend you will
   // still load the already opened files, without this you would need to restart the
   // entire app since the open files are stored in the backend
-  ipcMain.on('loadFiles', () => {
-    backend.openFiles.forEach(file => {
-      mainWindow.webContents.send('openedFile', {
-        uuid: file.uuid,
-        filename: file.filename,
-        shortName: file.shortName
+  // ipcMain.on('loadFiles', () => {
+  //   backend.openFiles.forEach(file => {
+  //     mainWindow.webContents.send('openedFile', {
+  //       uuid: file.uuid,
+  //       filename: file.filename,
+  //       shortName: file.shortName
+  //     })
+  //   })
+  // })
+
+  ipcMain.on('closeFile', (event, id) => {
+    backend.removeWatcher(id)
+    const index = backend.openFiles.findIndex(f => f.id === id)
+    if (index) {
+      backend.openFiles.splice(index, 1)
+      mainWindow.webContents.send('closedFile', {
+        uuid: id
       })
-    })
+    }
   })
 }
 
@@ -62,7 +74,7 @@ backend.getShortName = (filename) => {
 backend.setFileWatcher = (filename, cb) => {
   const uuid = uuidv4()
 
-  const watcher = fileWatcher.watchFile(filename,
+  const watcher = fileWatcher.watchFile(uuid, filename,
     (line) => {
       // console.log(`${uuid}: ${line}`)
       mainWindow.webContents.send(`line:${uuid}`, line)
@@ -80,4 +92,8 @@ backend.setFileWatcher = (filename, cb) => {
   }
 
   return cb(null, file)
+}
+
+backend.removeWatcher = (filename) => {
+  fileWatcher.unwatchFile(filename)
 }

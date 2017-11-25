@@ -28,13 +28,22 @@ class App extends React.Component {
   setListeners () {
     ipcRenderer.on('openedFile', (sender, file) => {
       this.addFile(file, () => {
+        if (file.contents) {
+          const lines = file.contents.split("\n")
+          this.addLinesToFile(lines, file)
+        }
+
         ipcRenderer.on(`line:${file.uuid}`, (sender, line) => this.addLineToFile(line, file))
+      })
+    })
+
+    ipcRenderer.on('closedFile', (sender, file) => {
+      this.removeFile(file, () => {
       })
     })
   }
 
   addFile (file, cb) {
-    console.log('add file:', file)
     const files = JSON.parse(JSON.stringify(this.state.files))
     const currentFile = this.state.currentFile || file.uuid
     file.nowrap = true
@@ -42,15 +51,39 @@ class App extends React.Component {
     this.setState({ files, currentFile }, cb)
   }
 
+  removeFile (file, cb) {
+    const files = JSON.parse(JSON.stringify(this.state.files))
+    const currentFile = this.state.currentFile || file.uuid
+    const index = files.findIndex(f => f.uuid === file.uuid)
+    files.splice(index, 1)
+    this.setState({ files, currentFile }, cb)
+  }
+
   addLineToFile (line, file) {
-    console.log('file (%s) has received new line: %s', file.filename, line)
     const files = JSON.parse(JSON.stringify(this.state.files))
     const modifiedFile = files.filter(f => f.uuid === file.uuid)[0]
     if (modifiedFile) {
-      if (!modifiedFile.lines) {
+      if (!modifiedFile.lines || !modifiedFile.lines.length) {
         modifiedFile.lines = []
       }
       modifiedFile.lines.push(line)
+
+      this.setState({ files })
+    }
+  }
+
+  addLinesToFile (lines, file) {
+    const files = JSON.parse(JSON.stringify(this.state.files))
+    const modifiedFile = files.filter(f => f.uuid === file.uuid)[0]
+    if (modifiedFile) {
+      if (!modifiedFile.lines || !modifiedFile.lines.length) {
+        modifiedFile.lines = []
+      }
+
+      lines.forEach(line => {
+        modifiedFile.lines.push(line)
+      })
+
       this.setState({ files })
     }
   }
